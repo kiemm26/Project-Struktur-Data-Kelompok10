@@ -20,8 +20,13 @@ vector<Data> readCSV(string filename)
       string line;
       getline(file, line); // skip header
 
+      int limit = 10000;
+      int count = 0;
       while (getline(file, line))
       {
+
+            if (count >= limit)
+                  break;
 
             if (line.empty())
                   continue;
@@ -48,6 +53,7 @@ vector<Data> readCSV(string filename)
             getline(ss, d.content, ',');
 
             dataset.push_back(d);
+            count++;
       }
       file.close();
       return dataset;
