@@ -18,7 +18,7 @@ void LinkedList::insert(Data d)
       head = newNode;
 }
 
-Node *LinkedList::searchByID(string id)
+Node *LinkedList::searchByID(int id)
 {
       Node *curr = head;
 
@@ -94,4 +94,125 @@ int LinkedList::count()
       }
 
       return total;
+}
+
+void LinkedList::showDuplicates()
+{
+    Node* curr = head;
+    bool found = false;
+
+    while (curr != NULL)
+    {
+        Node* checker = curr->next;
+
+        while (checker != NULL)
+        {
+            if (
+                curr->data.content == checker->data.content ||
+                (curr->data.name == checker->data.name &&
+                 curr->data.size == checker->data.size)
+            )
+            {
+                if (!found)
+                {
+                    cout << "Duplicate Data Found:\n";
+                    found = true;
+                }
+
+                cout << curr->data.id << " | " << curr->data.name << endl;
+                cout << checker->data.id << " | " << checker->data.name << endl;
+                cout << "-----------------------\n";
+            }
+
+            checker = checker->next;
+        }
+
+        curr = curr->next;
+    }
+
+    if (!found)
+    {
+        cout << "No duplicates found.\n";
+    }
+}
+
+bool LinkedList::updateData(int id, Data newData)
+{
+    Node* curr = head;
+
+    while (curr != NULL)
+    {
+        if (curr->data.id == id)
+        {
+            curr->data = newData;
+            return true;
+        }
+
+        curr = curr->next;
+    }
+
+    return false;
+}
+
+bool LinkedList::deleteData(int id)
+{
+    Node* curr = head;
+    Node* prev = NULL;
+
+    while (curr != NULL)
+    {
+        if (curr->data.id == id)
+        {
+            if (prev == NULL)
+            {
+                head = curr->next;
+            }
+            else
+            {
+                prev->next = curr->next;
+            }
+
+            delete curr;
+            return true;
+        }
+
+        prev = curr;
+        curr = curr->next;
+    }
+
+    return false;
+}
+
+void LinkedList::showStatistics()
+{
+    int total = count();
+    int duplicates = 0;
+
+    Node* curr = head;
+
+    while (curr != NULL)
+    {
+        Node* checker = curr->next;
+
+        while (checker != NULL)
+        {
+            if (
+                curr->data.content == checker->data.content ||
+                (curr->data.name == checker->data.name &&
+                 curr->data.size == checker->data.size)
+            )
+            {
+                duplicates++;
+            }
+
+            checker = checker->next;
+        }
+
+        curr = curr->next;
+    }
+
+    cout << "\n===== STATISTICS =====\n";
+    cout << "Total Data: " << total << endl;
+    cout << "Duplicate Data: " << duplicates << endl;
+    cout << "Unique Data: " << total - duplicates << endl;
 }

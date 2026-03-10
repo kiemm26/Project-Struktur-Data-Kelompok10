@@ -6,7 +6,7 @@ using namespace std;
 
 struct Data
 {
-      string id;
+      int id;
       string name;
       int size;
       string upload_date;

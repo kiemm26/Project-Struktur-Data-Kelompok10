@@ -30,10 +30,17 @@ vector<Data> readCSV(string filename)
             string temp;
             Data d;
 
-            getline(ss, d.id, ',');
+            getline(ss, temp, ',');
+            try
+            {
+                  d.id = stoi(temp);
+            }
+            catch (...)
+            {
+                  d.id = 0;
+            }
             getline(ss, d.name, ',');
             getline(ss, temp, ',');
-
             try
             {
                   d.size = stoi(temp);
