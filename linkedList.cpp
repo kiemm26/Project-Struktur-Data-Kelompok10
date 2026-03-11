@@ -417,6 +417,24 @@ void LinkedList::printDuplicates()
             cout << "+-----------------------------------------------------------------------------------------------------------------------------+" << endl;
       }
 }
+void LinkedList::showStatistics(long insertTime, long searchTime, long deleteTime, long showTime, long detectTime)
+{
+      int total = count();
+      int duplicate = countDuplicate();
+
+      cout << endl;
+      cout << "Total Data : " << total << endl;
+      cout << "Duplicate Data : " << duplicate << endl;
+      cout << "Unique Data : " << total - duplicate << endl;
+      cout << endl;
+      cout << "Execution Time Statistics (ms)" << endl;
+      cout << "Insert Time : " << insertTime << endl;
+      cout << "Search Time : " << searchTime << endl;
+      cout << "Delete Time : " << deleteTime << endl;
+      cout << "Show Time : " << showTime << endl;
+      cout << "Duplicate Detection Time : " << detectTime << endl;
+}
+
 
 void LinkedList::deleteByID(string id)
 {

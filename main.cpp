@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 #include "data.h"
 #include "linkedList.h"
@@ -238,20 +239,7 @@ int main()
             // STATISTICS
             case 6:
             {
-                  int total = list.count();
-                  int duplicate = list.countDuplicate();
-
-                  cout << endl;
-                  cout << "Total Data : " << total << endl;
-                  cout << "Duplicate Data : " << duplicate << endl;
-                  cout << "Unique Data : " << total - duplicate << endl;
-                  cout << endl;
-                  cout << "Execution Time Statistics (ms)" << endl;
-                  cout << "Insert Time : " << insertTime << endl;
-                  cout << "Search Time : " << searchTime << endl;
-                  cout << "Delete Time : " << deleteTime << endl;
-                  cout << "Show Time : " << showTime << endl;
-                  cout << "Duplicate Detection Time : " << detectTime << endl;
+                  list.showStatistics(insertTime, searchTime, deleteTime, showTime, detectTime);
                   break;
             }
             // EXIT

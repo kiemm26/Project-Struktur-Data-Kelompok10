@@ -29,6 +29,7 @@ public:
       void resetDuplicate();
       void printAll();
       void printDuplicates();
+      void showStatistics(long insertTime, long searchTime, long deleteTime, long showTime, long detectTime);
       void deleteByID(string id);
       int count();
       int countDuplicate();
