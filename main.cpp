@@ -3,8 +3,20 @@
 #include <chrono>
 
 #include "data.h"
-#include "linkedList.h"
 #include "fileHandler.h"
+
+// ── Toggle this define to benchmark either structure ──────────────────────────
+#define USE_HASH_SYSTEM // Aktifkan jika mau menggunakan hash table, default linked list
+
+#ifdef USE_HASH_SYSTEM
+#include "hashSystem.h"
+using DataStructure = HashSystem;
+using DataNode = HashNode;
+#else
+#include "linkedList.h"
+using DataStructure = LinkedList;
+using DataNode = Node;
+#endif
 
 using namespace std;
 
@@ -12,6 +24,11 @@ void showMenu()
 {
       cout << endl;
       cout << "===== DUPLICATE DETECTION SYSTEM =====" << endl;
+#ifdef USE_HASH_SYSTEM
+      cout << "[Structure: Hash Table]" << endl;
+#else
+      cout << "[Structure: Linked List]" << endl;
+#endif
       cout << "1. Insert Data" << endl;
       cout << "2. Search Data" << endl;
       cout << "3. Detect Duplicate" << endl;
@@ -24,7 +41,7 @@ void showMenu()
 
 int main()
 {
-      LinkedList list;
+      DataStructure ds;
 
       long insertTime = 0;
       long searchTime = 0;
@@ -33,45 +50,35 @@ int main()
       long detectTime = 0;
 
       vector<Data> dataset = readCSV("dataset/dataset.csv");
-
-      for (Data d : dataset)
-      {
-            list.insert(d);
-      }
+      for (Data d : dataset) ds.insert(d);
+            
       int choice;
-
       while (true)
       {
             showMenu();
             cin >> choice;
-            // INSERT DATA
+
             switch (choice)
             {
             case 1:
             {
                   Data d;
-
                   cout << "ID: ";
                   cin >> d.id;
-
                   cout << "Name: ";
                   cin >> d.name;
-
                   cout << "Size (KB): ";
                   cin >> d.size;
-
                   cout << "Upload date (yyyy-mm-dd): ";
                   cin >> d.upload_date;
-
                   cout << "Source: ";
                   cin >> d.source;
-
                   cout << "Content: ";
                   cin >> d.content;
 
                   auto start = chrono::high_resolution_clock::now();
 
-                  list.insert(d);
+                  ds.insert(d);
 
                   auto end = chrono::high_resolution_clock::now();
                   insertTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -83,112 +90,71 @@ int main()
             case 2:
             {
                   int option;
-
-                  cout << endl;
-                  cout << "SEARCH DATA" << endl;
-                  cout << "1. Search by ID" << endl;
-                  cout << "2. Search by Name" << endl;
-                  cout << "3. Search by ID and Name" << endl;
-                  cout << "Choose option: ";
-
+                  cout << "\nSEARCH DATA\n"
+                       << "1. Search by ID\n"
+                       << "2. Search by Name\n"
+                       << "3. Search by ID and Name\n"
+                       << "Choose option: ";
                   cin >> option;
+
+                  auto start = chrono::high_resolution_clock::now();
+                  DataNode *result = nullptr;
+
                   if (option == 1)
                   {
                         string id;
                         cout << "Enter ID: ";
                         cin >> id;
-
-                        auto start = chrono::high_resolution_clock::now();
-
-                        Node *result = list.searchByID(id);
-
-                        if (result != NULL)
-                        {
-                              cout << result->data.id << " | " << result->data.name << " | " << result->data.size << " | " << result->data.upload_date << " | " << result->data.source << " | " << result->data.content << endl;
-                        }
-                        else
-                        {
-                              cout << "Data not found" << endl;
-                        }
-
-                        auto end = chrono::high_resolution_clock::now();
-                        searchTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+                        result = ds.searchByID(id);
                   }
-
                   else if (option == 2)
                   {
                         string name;
                         cout << "Enter name: ";
                         cin >> name;
-
-                        auto start = chrono::high_resolution_clock::now();
-                        Node *result = list.searchByName(name);
-                        if (result != NULL)
-                        {
-                              cout << result->data.id << " | " << result->data.name << " | " << result->data.size << " | " << result->data.upload_date << " | " << result->data.source << " | " << result->data.content << endl;
-                        }
-                        else
-                        {
-                              cout << "Data not found" << endl;
-                        }
-
-                        auto end = chrono::high_resolution_clock::now();
-                        searchTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+                        result = ds.searchByName(name);
                   }
-
                   else if (option == 3)
                   {
                         string id, name;
-
                         cout << "Enter ID: ";
                         cin >> id;
                         cout << "Enter Name: ";
                         cin >> name;
-
-                        auto start = chrono::high_resolution_clock::now();
-
-                        Node *result = list.searchByIDAndName(id, name);
-                        if (result != NULL)
-                        {
-                              cout << result->data.id << " | " << result->data.name << " | " << result->data.size << " | " << result->data.upload_date << " | " << result->data.source << " | " << result->data.content << endl;
-                        }
-                        else
-                        {
-                              cout << "Data not found" << endl;
-                        }
-
-                        auto end = chrono::high_resolution_clock::now();
-                        searchTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+                        result = ds.searchByIDAndName(id, name);
                   }
+
+                  auto end = chrono::high_resolution_clock::now();
+                  searchTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+
+                  if (result != nullptr)
+                        cout << result->data.id << " | " << result->data.name << " | "
+                             << result->data.size << " | " << result->data.upload_date << " | "
+                             << result->data.source << " | " << result->data.content << endl;
+                  else
+                        cout << "Data not found" << endl;
                   break;
             }
             // DETECT DUPLICATE
             case 3:
             {
                   int option;
-
-                  cout << endl;
-                  cout << "DETECT DUPLICATE" << endl;
-                  cout << "1. Based on Content" << endl;
-                  cout << "2. Based on Metadata (Name + Size)" << endl;
-                  cout << "3. Based on Full Data" << endl;
-                  cout << "Choose option: ";
+                  cout << "\nDETECT DUPLICATE\n"
+                       << "1. Based on Content\n"
+                       << "2. Based on Metadata (Name + Size)\n"
+                       << "3. Based on Full Data\n"
+                       << "Choose option: ";
                   cin >> option;
 
                   auto start = chrono::high_resolution_clock::now();
 
                   if (option == 1)
-                  {
-                        list.detectDuplicateByContent();
-                  }
+                        ds.detectDuplicateByContent();
                   else if (option == 2)
-                  {
-                        list.detectDuplicateByMetadata();
-                  }
+                        ds.detectDuplicateByMetadata();
                   else if (option == 3)
-                  {
-                        list.detectDuplicateByFullData();
-                  }
+                        ds.detectDuplicateByFullData();
+
                   cout << "Duplicate detection completed!" << endl;
 
                   auto end = chrono::high_resolution_clock::now();
@@ -199,23 +165,16 @@ int main()
             case 4:
             {
                   int option;
-                  cout << endl;
-                  cout << "SHOW DATA" << endl;
-                  cout << "1. Show All Data" << endl;
-                  cout << "2. Show Duplicate Data" << endl;
-                  cout << "Choose option: ";
+                  cout << "\nSHOW DATA\n"
+                       << "1. Show All Data\n"
+                       << "2. Show Duplicate Data\n"
+                       << "Choose option: ";
+                  cin >> option;
 
                   auto start = chrono::high_resolution_clock::now();
 
-                  cin >> option;
-                  if (option == 1)
-                  {
-                        list.printAll();
-                  }
-                  else if (option == 2)
-                  {
-                        list.printDuplicates();
-                  }
+                  if (option == 1) ds.printAll();
+                  else if (option == 2) ds.printDuplicates();
 
                   auto end = chrono::high_resolution_clock::now();
                   showTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -230,7 +189,7 @@ int main()
 
                   auto start = chrono::high_resolution_clock::now();
 
-                  list.deleteByID(id);
+                  ds.deleteByID(id);
 
                   auto end = chrono::high_resolution_clock::now();
                   deleteTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -239,7 +198,7 @@ int main()
             // STATISTICS
             case 6:
             {
-                  list.showStatistics(insertTime, searchTime, deleteTime, showTime, detectTime);
+                  ds.showStatistics(insertTime, searchTime, deleteTime, showTime, detectTime);
                   break;
             }
             // EXIT

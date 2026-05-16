@@ -2,6 +2,7 @@ hashSystem.h
 hashSystem.cpp
 output/
 main
+main2
 *.o
 *.exe
 main.dSYM/
